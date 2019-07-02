@@ -34,6 +34,8 @@
 #include "ParticleCatalogue.h"
 #include "auxfunctions.h"
 #include "partialWidths.h"
+#include "prodFromBmesons.h"
+#include "userBRs.h"
 #include "plots.h"
 #include <fstream>
 #include <getopt.h>
@@ -223,17 +225,17 @@ int main(int argc, char **argv) {
 
   auto ch = N.getDecayChannels();
   Int_t longest_channel = 0;
-  for (auto it = ch.begin(); it != ch.end(); ++it) {
+  for (auto it = ch.begin(); it != ch.end(); ++it){
     if (longest_channel < (it->first).size()) {
       longest_channel = (it->first).size();
     }
   }
 
   std::ofstream lxf("decaychannels.txt");
-  for (auto it = ch.begin(); it != ch.end(); ++it) {
+  for (auto it = ch.begin(); it != ch.end(); ++it){
     if (it->second > 0) {
       lxf << "\\Gamma(";
-      for (Int_t index = 0; index < longest_channel; ++index) {
+      for (Int_t index = 0; index < longest_channel; ++index){
         if (index < (it->first).size()) {
           Int_t p = (it->first).at(index);
           std::cout << std::setw(9 * (1 + index)) << p;
@@ -313,5 +315,19 @@ int main(int argc, char **argv) {
   // N.setMass(3000);
   // LOG_INFO("pw: " << N.getPartialWidth(cfg, mu, rho));
 
+  // Sonia (01.06.2019): Testing new functions
+  Meson B = Meson(521, 5279.29, 187, MesonType::pseudoscalar, Charge::charged,
+			Quark_Type::up, Quark_Type::bottom);
+  Meson pi0 = 	Meson(111, 139.57018, 130.2, MesonType::pseudoscalar, Charge::neutral,
+					Quark_Type::up, Quark_Type::up);
+  Lepton mu = Lepton(13, 105.);
+  
+  Double_t kal = kallen(1.,2.,3.);
+  Double_t test = pw_prodFromBmeson_semileptonic(cfg, N, mu, B, pi0);
+  
+  Double_t test2 = prodBR_lept(521, 13, 3500., 5.e-12);
+  std::cout<<"test " << test << std::endl;
+  std::cout<<"test2 " << test2 << std::endl;
+  std::cout<<"kal " << kal << std::endl;
   return EXIT_SUCCESS;
 }

@@ -45,15 +45,22 @@ public:
     Meson D = Meson(411, 1869.62, 212, MesonType::pseudoscalar, Charge::charged,
                     Quark_Type::charm, Quark_Type::down);
     addTo(D);
+    
+   
     Meson Ds = Meson(431, 1968.47, 249, MesonType::pseudoscalar,
                      Charge::charged, Quark_Type::charm, Quark_Type::strange);
     addTo(Ds);
-    Meson B = Meson(521, 5279.29, 187, MesonType::pseudoscalar, Charge::charged,
-                    Quark_Type::up, Quark_Type::bottom);
-    addTo(B);
-    Meson Bc = Meson(541, 6275.1, 434, MesonType::pseudoscalar, Charge::charged,
-                     Quark_Type::charm, Quark_Type::bottom);
-    addTo(Bc);
+
+
+   // Mothers mesons
+	Meson B = Meson(521, 5279.29, 187, MesonType::pseudoscalar, Charge::charged,
+			Quark_Type::up, Quark_Type::bottom);
+	Meson B0 = Meson(511, 5279.61, 130, MesonType::pseudoscalar, Charge::neutral,
+		   Quark_Type::bottom, Quark_Type::down);
+	Meson Bs = Meson(531, 5366.79, 228, MesonType::pseudoscalar, Charge::neutral,
+	        Quark_Type::strange, Quark_Type::bottom);
+	Meson Bc = Meson(541, 6275.1, 434, MesonType::pseudoscalar, Charge::charged,
+			Quark_Type::charm, Quark_Type::bottom); 
 
     Meson pi0 =
         Meson(111, 134.9766, 130.2, MesonType::pseudoscalar, Charge::neutral);
@@ -117,7 +124,12 @@ public:
   }
 
   void addTo(const Meson &p) {
+	  
+	  
+	std::cout<<"use addTo(const Meson &p)" << std::endl;
+	std::cout<< "ID : " <<  p.getPdgId() << std::endl;
     mesons.insert(std::make_pair<Int_t, Meson>(p.getPdgId(), Meson(p)));
+    
   }
 
   void addTo(const Lepton &p) {
