@@ -124,10 +124,8 @@ public:
   }
 
   void addTo(const Meson &p) {
-	  
-	  
-	std::cout<<"use addTo(const Meson &p)" << std::endl;
-	std::cout<< "ID : " <<  p.getPdgId() << std::endl;
+	//std::cout<<"use addTo(const Meson &p)" << std::endl;
+	//std::cout<< "ID : " <<  p.getPdgId() << std::endl;
     mesons.insert(std::make_pair<Int_t, Meson>(p.getPdgId(), Meson(p)));
     
   }

@@ -34,7 +34,7 @@ public:
     mass = m;
     angle = U2;
     generation.emplace_back(Lepton(a));
-    dc_c;
+    //dc_c;
     majorana = true;
   }
   HNL(TString n, Double_t m, Double_t U2, const std::vector<Lepton> &a) {
@@ -44,7 +44,7 @@ public:
     for (auto l : a) {
       generation.emplace_back(Lepton(l));
     }
-    dc_c;
+    //dc_c;
 
     majorana = true;
   }
