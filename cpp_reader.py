@@ -1,15 +1,21 @@
 from subprocess import Popen, PIPE
 
 
-def get_prod_BR(HNLmass_GeV, HNLlifetime_ns, B_ID, meson_ID, lepton_ID):
+def get_prod_BR(HNLmass_GeV, HNLlifetime_ns, B_ID, meson_ID, lepton_ID, 
+        cHNLdecayDIR='../cHNLdecay/', verbose=False):
 	
-	HNLmass_MeV = HNLmass_GeV*1e3;
+	HNLmass_MeV = HNLmass_GeV*1e3
 	
-	output = Popen(['./cHNLdecay', '--mainmode', '1', '--BmesonID', str(B_ID), '--daughterMesonID', str(meson_ID), '--generations', str(lepton_ID), '--mass', str(HNLmass_MeV), '--lifetime-ns', str(HNLlifetime_ns)], stdout=PIPE)
+	output = Popen(['./cHNLdecay', '--mainmode', '1', '--BmesonID', str(B_ID), 
+            '--daughterMesonID', str(meson_ID), '--generations', str(lepton_ID), 
+            '--mass', str(HNLmass_MeV), '--lifetime-ns', str(HNLlifetime_ns)], 
+            stdout=PIPE, cwd=cHNLdecayDIR)
+
 	out = output.stdout.read()
-	out_BR = float(out.split()[0]);
-	print "\n------\nINFO: BR calculator output: ", out_BR, "\n-------\n";
-	return out_BR;
+	out_BR = float(out.split()[0])
+        if verbose: print("\n------\nINFO: BR calculator output: ", out_BR, "\n-------\n")
+
+	return out_BR
 
 import matplotlib
 matplotlib.use('Agg')
@@ -22,9 +28,9 @@ import sys
 
 def plot_prod_BR():
 	
-	BR1 = [];
-	BR2 = [];
-	BR3 = [];
+	BR1 = []
+	BR2 = []
+	BR3 = []
 	M = (0.5, 1, 2, 4)
 	# Fixed lifetime 1ns
 	lifetime=10 #1ns
@@ -41,5 +47,6 @@ def plot_prod_BR():
 	plt.plot(M, BR1, color='sienna', linestyle = 'dashed',linewidth = 0.8,label=r'$B^0 \rightarrow \mu^+ N$')
 	plt.plot(M, BR2, color='orangered', linestyle = 'dashed',linewidth = 0.8,label=r'$B^0 \rightarrow \pi^- \mu^+ N$')
 	plt.legend()
-	plt.savefig('prod_BRs_check.pdf');
+	plt.savefig('prod_BRs_check.pdf')
 	
+
