@@ -25,14 +25,14 @@ Double_t kallen(Double_t a, Double_t b, Double_t c) {
 
 Double_t Lambda(Double_t xi, Double_t yhp, Double_t yl, Double_t yN) {
 	//std::cout<<"Lambda " << sqrt(kallen(1, pow(yhp, 2), xi)) * sqrt(kallen(xi, pow(yN, 2), pow(yl, 2))) << std::endl;
-	if (kallen(1, pow(yhp, 2), xi) < 0) std::cout << " _____kallen(1, pow(yhp, 2), xi) < 0_____" << kallen(1, pow(yhp, 2), xi) << std::endl;
-	if (kallen(xi, pow(yN, 2), pow(yl, 2)) < 0){
-		 std::cout << " _____kallen(xi, pow(yN, 2), pow(yl, 2)) < 0_____ = " << kallen(xi, pow(yN, 2), pow(yl, 2)) << std::endl;
-		 std::cout << " xi " << xi << std::endl;
-		 std::cout << " yhp " << yhp << std::endl;
-		 std::cout << " yl " << yl << std::endl;
-		 std::cout << " yN " << yN << std::endl;
-	 }
+	//if (kallen(1, pow(yhp, 2), xi) < 0) std::cout << " _____kallen(1, pow(yhp, 2), xi) < 0_____" << kallen(1, pow(yhp, 2), xi) << std::endl;
+	//if (kallen(xi, pow(yN, 2), pow(yl, 2)) < 0){
+		 //std::cout << " _____kallen(xi, pow(yN, 2), pow(yl, 2)) < 0_____ = " << kallen(xi, pow(yN, 2), pow(yl, 2)) << std::endl;
+		 //std::cout << " xi " << xi << std::endl;
+		 //std::cout << " yhp " << yhp << std::endl;
+		 //std::cout << " yl " << yl << std::endl;
+		 //std::cout << " yN " << yN << std::endl;
+	 //}
 	return sqrt(abs(kallen(1, pow(yhp, 2), xi))) * sqrt(abs(kallen(xi, pow(yN, 2), pow(yl, 2))));
 	//return kallen(1, pow(yhp, 2), xi) * kallen(xi, pow(yN, 2), pow(yl, 2));
 }

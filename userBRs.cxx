@@ -248,6 +248,32 @@ Double_t tau0_to_U2(Double_t mN, Double_t tau0mN){
 	return U2;
 }
 
+Double_t U2_to_tau0(Double_t mN, Double_t U2){
+	
+	
+	std::vector<std::vector<Double_t>> mNtau1_vec = file_to_vec("./HNLtau1_xsorted.csv");
+	size_t s = mNtau1_vec.size();
+	std::vector<Double_t> mN_vec(s,0);
+	std::vector<Double_t> tau1_vec(s,0);
+	
+	for(size_t i(0); i<s; ++i){
+		mN_vec[i] = mNtau1_vec[i][0];
+		tau1_vec[i] = mNtau1_vec[i][1];
+	}
+	
+	Double_t tau0mN, tau1;
+	int idxmN_;
+	//computations
+	
+	//grab closer mN (convert in GeV to compare to the paper)
+	idxmN_ = findClosestIdx(mN_vec, mN*1e-3); 	//mN in GeV
+	tau1 = tau1_vec[idxmN_]*1e9; 				// tau in ns
+	
+	//proportionnality
+	tau0mN = tau1/U2;
+	return tau0mN;
+}
+
 
 // production BR: leptonic case
 
@@ -256,6 +282,40 @@ Double_t prodBR_lept(int idB, int idl, Double_t mN, Double_t tau0mN){
 	Double_t BR;
 	Double_t pw, totw, tau0B;
 	Double_t U2 = tau0_to_U2(mN, tau0mN);
+	
+	test_value(U2, 0., 1., "coupling U_{muN}^2");
+	
+	//std::cout << "U2(" << tau0mN << ") = " << U2 << std::endl;
+	
+	//Declare the HNL
+	HNL N = HNL("HNL", mN, U2, mixes_with);
+	N.setMajorana(majorana);
+	
+	Meson B; Lepton l;
+	int i,j;
+	
+	switch(idB){
+		case 521: B = Bp; i = 2; j = 0; tau0B = tau0Bp; break;
+		case 541: B = Bc; i = 2; j = 1; tau0B = tau0Bc; break;
+		default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list of leptonic decays (521, 541)!"<<std::endl; return 1.;	
+	}
+		
+	switch(idB){
+		case 11: l = el; break;
+		case 13: l = mu; break;
+		case 15: l = tau; break;
+	}
+			
+	pw = pow(VCKM[i][j],2)*pw_prodFromBmeson_leptonic(cfg, N, l, B);
+	totw = hbar/tau0B;
+	test_value(pw/totw, 0., 1., "Production branching ratio");
+	return pw/totw;
+}
+
+Double_t prodBR_lept_U2(int idB, int idl, Double_t mN, Double_t U2){
+	
+	Double_t BR;
+	Double_t pw, totw, tau0B;
 	
 	test_value(U2, 0., 1., "coupling U_{muN}^2");
 	
@@ -318,7 +378,10 @@ Double_t prodBR_semilept(int idB, int idl, int idH, Double_t mN, Double_t tau0mN
 	
 	// try to do it with jkey
 	switch(idH){
-		case 111: H = pi; j = 0; break;
+		case 211: H = pi; j = 0; break;
+		case 111: H = pi0; j = 0; break;
+		case 213: H = rho; j = 0; break;
+		case 113: H = rho0; j = 0; break;
 		default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list (111)!"<<std::endl; return 1.;
 
 	}
@@ -337,6 +400,65 @@ Double_t prodBR_semilept(int idB, int idl, int idH, Double_t mN, Double_t tau0mN
 	
 	return pw/totw;
 }
+
+
+// production BR: semileptonic case in pseudoscalar meson 
+
+Double_t prodBR_semilept_U2(int idB, int idl, int idH, Double_t mN, Double_t U2){
+	
+	
+	Double_t BR;
+	Double_t pw, totw, tau0B;
+	
+	test_value(U2, 0., 1., "coupling U_{muN}^2");
+
+	
+	
+	//Declare the HNL
+	HNL N = HNL("HNL", mN, U2, mixes_with);
+	bool majorana = true;
+	N.setMajorana(majorana);
+	
+	Meson B; Meson H; Lepton l;
+	bool isP(1);
+	int i,j;
+	
+	switch(idB){
+		case 511: B = B0; j = 0; tau0B = tau0B0; break;
+		case 521: B = Bp; i = 0; tau0B = tau0Bp; break;
+		case 531: B = Bs; j = 1; tau0B = tau0Bs; break;
+		case 541: B = Bc; i = 1; tau0B = tau0Bc; break;
+		default: std::cerr<<"ERROR: Beauty meson ID not among the pre-programmed list of semileptonic decays (511, 521, 531, 541)!"<<std::endl;	
+	}
+	
+	// try to do it with jkey
+	switch(idH){
+		case 211: H = pi; j = 0; break;
+		case 111: H = pi0; j = 0; break;
+		case 213: H = rho; j = 0; break;
+		case 113: H = rho0; j = 0; break;
+		default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list (111)!"<<std::endl; return 1.;
+
+	}
+		
+	switch(idB){
+		case 11: l = el; break;
+		case 13: l = mu; break;
+		case 15: l = tau; break;
+	}
+	
+	if(isP)	pw = pow(VCKM[i][j],2)*pw_prodFromBmeson_semileptonic(cfg, N, l, B, H); // pseudoscalar meson
+	else 	pw = pow(VCKM[i][j],2)*pw_prodFromBmeson_semileptonic(cfg, N, l, B, H); // vector meson
+	totw = hbar/tau0B;
+	
+	test_value(pw/totw, 0., 1., "Production branching ratio");
+	
+	return pw/totw;
+}
+
+
+
+
 
 
 // decay BR: semileptonic case, 2 body

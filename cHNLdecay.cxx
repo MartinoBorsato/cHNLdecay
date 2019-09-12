@@ -202,7 +202,8 @@ int main(int argc, char **argv) {
   }
   
   
-  if(mainmode==0){
+  switch (mainmode){
+      case 0: {
 
 	  /* Print any remaining command line arguments (not options). */
 	  if (optind < argc) {
@@ -352,7 +353,7 @@ int main(int argc, char **argv) {
 	  
 	}
 	
-	else if(mainmode==1){
+    case 1: {
 		
 //		std::cout<<"hello: "<<mixes_with[0].getPdgId()<<std::endl;
 //		std::cout<<"BID: "<<BID<<std::endl;
@@ -360,18 +361,39 @@ int main(int argc, char **argv) {
 		if(dID==0){
 			//Double_t HNLmass_GeV = ;
 			for (size_t i(0); i<mixes_with.size(); i++){
-				std::cout<<prodBR_lept(BID, mixes_with[i].getPdgId(), HNLmass, tau0);
+				std::cout<<prodBR_lept(BID, mixes_with[i].getPdgId(), HNLmass, tau0) << std::endl;
+                std::cout<<tau0_to_U2(HNLmass, tau0);
 				//std::cout<<"leptonic"<<std::endl;
 			}
 		}
 		
 		else{
 			for (size_t i(0); i<mixes_with.size(); i++){
-				std::cout<<prodBR_semilept(BID, mixes_with[i].getPdgId(), dID, HNLmass, tau0);
+				std::cout<<prodBR_semilept(BID, mixes_with[i].getPdgId(), dID, HNLmass, tau0) << std::endl;
+                std::cout<<tau0_to_U2(HNLmass, tau0);
 				//std::cout<<"semileptonic"<<std::endl;
 			}
-		}	
-	}
+		}
+    }
+
+    case 2: {
+
+		if(dID==0){
+			for (size_t i(0); i<mixes_with.size(); i++){
+				std::cout<<prodBR_lept_U2(BID, mixes_with[i].getPdgId(), HNLmass, angle) << std::endl;
+                std::cout<<U2_to_tau0(HNLmass, angle);
+			}
+		}
+		
+		else{
+			for (size_t i(0); i<mixes_with.size(); i++){
+				std::cout<<prodBR_semilept_U2(BID, mixes_with[i].getPdgId(), dID, HNLmass, angle) << std::endl;
+                std::cout<<tau0_to_U2(HNLmass, tau0);
+			}
+
+        }
+    }
+  }
   //Double_t test2 = prodBR_lept(521, 13, 3500., 5.e-12);
   //std::cout<<"test " << test << std::endl;
   //std::cout<<"test2 " << test2 << std::endl;
