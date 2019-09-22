@@ -29,8 +29,8 @@ std::vector<std::vector<Double_t>> VCKM{{0.97427, 0.22534, 0.00351},
 										{0.22520, 0.97344, 0.04120}, 
 										{0.00867, 0.04040, 0.999146}};
 
-Double_t mN = 0;
-Double_t U2 = 0;
+//Double_t mN = 0;
+//Double_t U2 = 0;
 
 bool majorana = true;
 
@@ -44,10 +44,12 @@ Double_t ctau = 0;
 
 ParticleCatalogue pc;
 
-std::vector<Meson> mesons = pc.getAllMesons();
+std::vector<Lepton> all_leptons = pc.getAllLeptons();
+
+std::vector<Meson> all_mesons = pc.getAllMesons();
 	
 
-///////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 // Declaration of all the particles we need for the HNL production
 	
 	
@@ -60,6 +62,8 @@ Double_t tauMass = 1776.82;           // MeV
 Lepton el = Lepton(11, electronMass);
 Lepton mu = Lepton(13, muonMass);
 Lepton tau = Lepton(15, tauMass);	
+
+//std::vector<Lepton> mu_leptons = {mu};
 
 std::vector<Lepton> mixes_with={mu};
 	
@@ -74,45 +78,44 @@ Double_t tau0Bc = 0.507e-12;		//s
 
 
 Meson Bp = Meson(521, 5279.29, 187, MesonType::pseudoscalar, Charge::charged,
-			Quark_Type::up, Quark_Type::bottom);
-	Meson B0 = Meson(511, 5279.61, 130, MesonType::pseudoscalar, Charge::neutral,
-		   Quark_Type::bottom, Quark_Type::down);
-	Meson Bs = Meson(531, 5366.79, 228, MesonType::pseudoscalar, Charge::neutral,
-	        Quark_Type::strange, Quark_Type::bottom);
-	Meson Bc = Meson(541, 6275.1, 434, MesonType::pseudoscalar, Charge::charged,
-			Quark_Type::charm, Quark_Type::bottom); 
+		Quark_Type::up, Quark_Type::bottom);
+Meson B0 = Meson(511, 5279.61, 130, MesonType::pseudoscalar, Charge::neutral,
+	   Quark_Type::bottom, Quark_Type::down);
+Meson Bs = Meson(531, 5366.79, 228, MesonType::pseudoscalar, Charge::neutral,
+        Quark_Type::strange, Quark_Type::bottom);
+Meson Bc = Meson(541, 6275.1, 434, MesonType::pseudoscalar, Charge::charged,
+		Quark_Type::charm, Quark_Type::bottom); 
 	
-	// Daughters mesons
+// Daughters mesons
 	
 	
-	Meson pi = 		 Meson(211, 139.57018, 130.2, MesonType::pseudoscalar,
-					Charge::charged, Quark_Type::up, Quark_Type::down);
+Meson pi = 		Meson(211, 139.57018, 130.2, MesonType::pseudoscalar,
+				Charge::charged, Quark_Type::up, Quark_Type::down);
 	
-	Meson pi0 = 	Meson(111, 139.57018, 130.2, MesonType::pseudoscalar, Charge::neutral,
-					Quark_Type::up, Quark_Type::up);
-	//std::cout << "hello1 " << std:: endl; 
-    Meson rho = 	Meson(213, 775.4, 208.5, MesonType::vector, Charge::charged,
-                    Quark_Type::up, Quark_Type::down);
-	Meson rho0 = 	Meson(113, 775.49, 208.5, MesonType::vector, Charge::neutral,
-                    Quark_Type::up, Quark_Type::up);
-    //std::cout << "hello2 " << std:: endl;             	
-	Meson K = 		Meson(313, 493.677, 159.8, MesonType::pseudoscalar, Charge::charged,
-                    Quark_Type::strange, Quark_Type::up);
-    Meson Kst = 	Meson(323, 891.92, 212.0, MesonType::vector, Charge::charged,
-					Quark_Type::strange, Quark_Type::up);
-
-	Meson D = 		Meson(411, 1869.62, 222.6, MesonType::pseudoscalar, Charge::charged,
-                    Quark_Type::down, Quark_Type::charm);
-    Meson Dst = 	Meson(413, 2010.26, 535.000, MesonType::vector, Charge::charged, 
-					Quark_Type::charm, Quark_Type::down);
-	Meson D0bar  = 	Meson(421, 1864.84, 212, MesonType::pseudoscalar, Charge::neutral,
-					Quark_Type::up, Quark_Type::charm);
-    Meson D0barst = Meson(423, 2006.97, 212, MesonType::vector, Charge::neutral,
-					Quark_Type::down, Quark_Type::charm);
-    Meson Ds = 		Meson(431, 1968.47, 249, MesonType::pseudoscalar,
-                    Charge::charged, Quark_Type::charm, Quark_Type::strange);              
-    Meson Dsst = 	Meson(433, 2112.1, 650.000, MesonType::vector,
-                    Charge::charged, Quark_Type::charm, Quark_Type::strange);              
+Meson pi0 = 	Meson(111, 139.57018, 130.2, MesonType::pseudoscalar, Charge::neutral,
+				Quark_Type::up, Quark_Type::up);
+//std::cout << "hello1 " << std:: endl; 
+Meson rho = 	Meson(213, 775.4, 208.5, MesonType::vector, Charge::charged,
+				Quark_Type::up, Quark_Type::down);
+Meson rho0 = 	Meson(113, 775.49, 208.5, MesonType::vector, Charge::neutral,
+				Quark_Type::up, Quark_Type::up);
+//std::cout << "hello2 " << std:: endl;             	
+Meson K = 		Meson(313, 493.677, 159.8, MesonType::pseudoscalar, Charge::charged,
+				Quark_Type::strange, Quark_Type::up);
+Meson Kst = 	Meson(323, 891.92, 212.0, MesonType::vector, Charge::charged,
+				Quark_Type::strange, Quark_Type::up);
+Meson D = 		Meson(411, 1869.62, 222.6, MesonType::pseudoscalar, Charge::charged,
+				Quark_Type::down, Quark_Type::charm);
+Meson Dst = 	Meson(413, 2010.26, 535.000, MesonType::vector, Charge::charged, 
+				Quark_Type::charm, Quark_Type::down);
+Meson D0bar  = 	Meson(421, 1864.84, 212, MesonType::pseudoscalar, Charge::neutral,
+				Quark_Type::up, Quark_Type::charm);
+Meson D0barst = Meson(423, 2006.97, 212, MesonType::vector, Charge::neutral,
+				Quark_Type::down, Quark_Type::charm);
+Meson Ds = 		Meson(431, 1968.47, 249, MesonType::pseudoscalar,
+				Charge::charged, Quark_Type::charm, Quark_Type::strange);              
+Meson Dsst = 	Meson(433, 2112.1, 650.000, MesonType::vector,
+				Charge::charged, Quark_Type::charm, Quark_Type::strange);              
 
 //HNL N("tmp", 0.0, 0.0, mixes_with);        
 
@@ -226,8 +229,8 @@ int findClosestIdx(std::vector<Double_t> arr, Double_t target)
 
 /** FUNCTIONS **/
 
-Double_t tau0_to_U2(Double_t mN, Double_t tau0mN){
-	
+/*
+Double_t tau0_to_U2(Double_t mN, Double_t tau0mN){ // inputs: mN in MeV, tau0mN in ns
 	
 	std::vector<std::vector<Double_t>> mNtau1_vec = file_to_vec("./HNLtau1_xsorted.csv");
 	size_t s = mNtau1_vec.size();
@@ -250,6 +253,27 @@ Double_t tau0_to_U2(Double_t mN, Double_t tau0mN){
 	//proportionnality
 	U2=tau1/tau0mN;
 	return U2;
+}
+*/
+
+Double_t tau0_to_U2(Double_t mN, Double_t tau0mN){ // inputs: mN in MeV, tau0mN in ns
+	
+	//Double_t tau1;
+	HNL N = HNL("HNL", mN, 1., mixes_with);
+	Double_t tau1 = hbar/N.getTotalWidth(cfg, mixes_with, all_mesons)*1e9; // in ns
+	
+	//proportionnality
+	Double_t U2=tau1/tau0mN;
+	return U2;
+}
+
+Double_t get_tau0ns(Double_t mN, Double_t U2){ // inputs: mN in MeV, tau0mN in ns
+	
+	//Double_t tau1;
+	HNL N = HNL("HNL", mN, U2, mixes_with);
+	Double_t tau0 = hbar/N.getTotalWidth(cfg, mixes_with, all_mesons)*1e9; // in ns
+	
+	return tau0;
 }
 
 Double_t U2_to_tau0(Double_t mN, Double_t U2){
@@ -352,8 +376,7 @@ Double_t prodBR_lept_U2(int idB, int idl, Double_t mN, Double_t U2){
 
 // production BR: semileptonic case in pseudoscalar meson 
 
-Double_t prodBR_semilept(int idB, int idl, int idH, Double_t mN, Double_t tau0mN){
-	
+Double_t prodBR_semilept(int idB, int idl, int idH, Double_t mN, Double_t tau0mN){ //mN in MeV
 	
 	Double_t BR;
 	Double_t pw, totw, tau0B;
@@ -584,9 +607,58 @@ Double_t decayBR_lepton_lepton_neutrino(int idlA, int idlB, int idnuB, Double_t 
 }
 
 
+Double_t prodBR_Lambdab_proton(Double_t HNLmass, Double_t tau0){
+	Double_t BR;
+	//Double_t pw, totw;
+	//Double_t tau0Lambdab(1e-12);
+	Double_t U2 = tau0_to_U2(HNLmass, tau0); //
+	
+	test_value(U2, 0., 1., "coupling U_{muN}^2");	
+	
+	//Declare the HNL
+	HNL N = HNL("HNL", HNLmass, U2, mixes_with);
+	bool majorana = true;
+	N.setMajorana(majorana);
+	
+	Lepton l = mu;
+	
+	BR = BR_prod_Lambdab_proton(cfg, N, l);
+	
+	//std::cout << "pw: " << pw << std::endl;
+	//totw = hbar/tau0Lambdab;
+	//std::cout << "totw: " << totw << std::endl;
+	
+	test_value(BR, 0., 1., "Production branching ratio");
+	return BR;
+}
 
-
-
+Double_t prodBR_Lambdab_Lambdac(Double_t HNLmass, Double_t tau0){
+	
+	Double_t BR;
+	//Double_t pw, totw;
+	//Double_t tau0Lambdab(1e-12);
+	Double_t U2 = tau0_to_U2(HNLmass, tau0); //
+	
+	test_value(U2, 0., 1., "coupling U_{muN}^2");	
+	
+	
+	//Declare the HNL
+	HNL N = HNL("HNL", HNLmass, U2, mixes_with);
+	bool majorana = true;
+	N.setMajorana(majorana);
+	
+	Lepton l = mu;
+	
+	BR = BR_prod_Lambdab_Lambdac(cfg, N, l);
+	
+	
+	//std::cout << "pw: " << pw << std::endl;
+	//totw = hbar/tau0Lambdab;
+	//std::cout << "totw: " << totw << std::endl;
+	
+	test_value(BR, 0., 1., "Production branching ratio");
+	return BR;
+}
 
 
 

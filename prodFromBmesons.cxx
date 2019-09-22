@@ -1364,16 +1364,31 @@ Double_t compute_dint_Lambdab_proton(std::shared_ptr<Config> cfg, HNL N, Lepton 
 	f3V = f3V_Lambdab_proton(q2);	f3A = f3A_Lambdab_proton(q2);
 	
 	
+	std::cout<<"f1V: " << f1V << std::endl;
+	std::cout<<"f1A: " << f1A << std::endl;
+	std::cout<<"f2V: " << f2V << std::endl;
+	std::cout<<"f2A: " << f2A << std::endl;
+	std::cout<<"f3V: " << f3V << std::endl;
+	std::cout<<"f3A: " << f3A << std::endl;
+	
 	a1V = a1(q2, mh, mhp, ml, mN, 1);    a1A = a1(q2, mh, mhp, ml, mN, 0);
 	a2V = a2(q2, mh, mhp, ml, mN, 1);    a2A = a2(q2, mh, mhp, ml, mN, 0);
 	a3V = a3(q2, mh, mhp, ml, mN, 1);    a3A = a3(q2, mh, mhp, ml, mN, 0);
 	a12V = a12(q2, mh, mhp, ml, mN, 1); a12A = a12(q2, mh, mhp, ml, mN, 0);
 	a13V = a13(q2, mh, mhp, ml, mN, 1); a13A = a13(q2, mh, mhp, ml, mN, 0);
 	
-
+	std::cout<<"a1V: " << a1V << std::endl; std::cout<<"a1A: " << a1A << std::endl;
+	std::cout<<"a2V: " << a2V << std::endl; std::cout<<"a2A: " << a2A << std::endl;
+	std::cout<<"a3V: " << a3V << std::endl; std::cout<<"a3A: " << a3A << std::endl;
+	std::cout<<"a12V: " << a12V << std::endl; std::cout<<"a12A: " << a12A << std::endl;
+	std::cout<<"a13V: " << a13V << std::endl; std::cout<<"a13A: " << a13A << std::endl;
+	
 	factor1 = sqrt(kallen(pow(ml,2), pow(mN,2), q2)*kallen(pow(mh,2), pow(mhp,2), q2));
 	
-	return factor1*(
+	
+	
+	Double_t result = 
+	factor1*(
 			 16/(3*pow(q2,3))*pow(f1V,2)*a1V
 			+8/(3*pow(mh,2)*pow(q2,2))*pow(f2V,2)*a2V
 			+8/(3*pow(mh,2)*q2)*pow(f3V,2)*a3V
@@ -1388,6 +1403,12 @@ Double_t compute_dint_Lambdab_proton(std::shared_ptr<Config> cfg, HNL N, Lepton 
 				+f1A*f3A*a13A
 				)
 			);
+	
+	
+	std::cout<<"result: " << result << std::endl;
+	
+	
+	return result;
 }
 
 Double_t compute_dint_Lambdab_Lambdac(std::shared_ptr<Config> cfg, HNL N, Lepton l, Double_t mh, Double_t mhp, Double_t q2) {
@@ -1411,12 +1432,25 @@ Double_t compute_dint_Lambdab_Lambdac(std::shared_ptr<Config> cfg, HNL N, Lepton
 	f2V = f2V_Lambdab_Lambdac(q2);	f2A = f2A_Lambdab_Lambdac(q2);
 	f3V = f3V_Lambdab_Lambdac(q2);	f3A = f3A_Lambdab_Lambdac(q2);
 	
+	std::cout<<"f1V: " << f1V << std::endl;
+	std::cout<<"f1A: " << f1A << std::endl;
+	std::cout<<"f2V: " << f2V << std::endl;
+	std::cout<<"f2A: " << f2A << std::endl;
+	std::cout<<"f3V: " << f3V << std::endl;
+	std::cout<<"f3A: " << f3A << std::endl;
 	
 	a1V = a1(q2, mh, mhp, ml, mN, 1);    a1A = a1(q2, mh, mhp, ml, mN, 0);
 	a2V = a2(q2, mh, mhp, ml, mN, 1);    a2A = a2(q2, mh, mhp, ml, mN, 0);
 	a3V = a3(q2, mh, mhp, ml, mN, 1);    a3A = a3(q2, mh, mhp, ml, mN, 0);
 	a12V = a12(q2, mh, mhp, ml, mN, 1); a12A = a12(q2, mh, mhp, ml, mN, 0);
 	a13V = a13(q2, mh, mhp, ml, mN, 1); a13A = a13(q2, mh, mhp, ml, mN, 0);
+	
+	
+	std::cout<<"a1V: " << a1V << std::endl; std::cout<<"a1A: " << a1A << std::endl;
+	std::cout<<"a2V: " << a2V << std::endl; std::cout<<"a2A: " << a2A << std::endl;
+	std::cout<<"a3V: " << a3V << std::endl; std::cout<<"a3A: " << a3A << std::endl;
+	std::cout<<"a12V: " << a12V << std::endl; std::cout<<"a12A: " << a12A << std::endl;
+	std::cout<<"a13V: " << a13V << std::endl; std::cout<<"a13A: " << a13A << std::endl;
 	
 
 	factor1 = sqrt(kallen(pow(ml,2), pow(mN,2), q2)*kallen(pow(mh,2), pow(mhp,2), q2));
@@ -1441,11 +1475,12 @@ Double_t compute_dint_Lambdab_Lambdac(std::shared_ptr<Config> cfg, HNL N, Lepton
 
 ///////////////////////////////
 
-Double_t pw_prod_Lambdab_proton(std::shared_ptr<Config> cfg, HNL N, Lepton l){
+Double_t BR_prod_Lambdab_proton(std::shared_ptr<Config> cfg, HNL N, Lepton l){
 	
+	std::cout << "inside BR_prod" << std::endl; 
 	Double_t GF = 1e-11;
 	Double_t pi = 3.141592;
-	Double_t hbar = 1.;
+	double hbar=4.135667e-21; //in MeV/s
 	Double_t VCKM(1.);
 	Double_t tauLb(1e-12);
 	
@@ -1453,19 +1488,19 @@ Double_t pw_prod_Lambdab_proton(std::shared_ptr<Config> cfg, HNL N, Lepton l){
 	Double_t mN = N.getMass();
 	Double_t U2 = N.getAngle();
 	
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
+	Double_t mh = 5620.2;
+	Double_t mhp = 938.272;
 	
 	// Integration
 	Double_t a = pow(ml+mN,2);
-	Double_t b = pow(mh-mhp,2);
+	Double_t b = pow(mh-mhp,2)-0.001;
 	Double_t nsteps = 1000;
 	Double_t step = (b-a)/nsteps;
 	Double_t q21, q22, q23;
 	Double_t f_q21, f_q22, f_q23;
 	Double_t fstep(0), res(0);
 	
-	if(step < 0) return 0;
+	if(step < 0){ std::cout << "return 0 because step < 0" << std::endl; return 0;}
 	else{
 		
 		for(int i(0); i<nsteps; ++i){
@@ -1473,11 +1508,9 @@ Double_t pw_prod_Lambdab_proton(std::shared_ptr<Config> cfg, HNL N, Lepton l){
 			q22 = a+(i+0.5)*step; //std::cout << "xi2" << xi2 << std::endl;
 			q23 = a+(i+1.)*step; //std::cout << "xi3" << xi3 << std::endl;
 			
-			
 			f_q21 = compute_dint_Lambdab_proton(cfg, N, l, mh, mhp, q21);
 			f_q22 = compute_dint_Lambdab_proton(cfg, N, l, mh, mhp, q22);
 			f_q23 = compute_dint_Lambdab_proton(cfg, N, l, mh, mhp, q23);
-			
 			
 			fstep = step*(1./6.*f_q21 + 4./6.*f_q22 + 1./6.*f_q23);
 			
@@ -1487,20 +1520,20 @@ Double_t pw_prod_Lambdab_proton(std::shared_ptr<Config> cfg, HNL N, Lepton l){
 	}
 }
 
-Double_t pw_prod_Lambdab_Lambdac(std::shared_ptr<Config> cfg, HNL N, Lepton l){
+Double_t BR_prod_Lambdab_Lambdac(std::shared_ptr<Config> cfg, HNL N, Lepton l){
 	
-	Double_t GF = 1e-11;
+	Double_t GF = 1.1663787e-11;
 	Double_t pi = 3.141592;
-	Double_t hbar = 1.;
+	Double_t hbar=4.135667e-21;
 	Double_t VCKM(1.);
-	Double_t tauLb(1e-12);
+	Double_t tauLb(1.466e-12);
 	
 	Double_t ml = l.getMass();
 	Double_t mN = N.getMass();
 	Double_t U2 = N.getAngle();
 	
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
+	Double_t mh = 5620.2;
+	Double_t mhp = 2286.46;
 	
 	// Integration
 	Double_t a = pow(ml+mN,2);
@@ -1518,17 +1551,17 @@ Double_t pw_prod_Lambdab_Lambdac(std::shared_ptr<Config> cfg, HNL N, Lepton l){
 			q21 = a+i*step; //std::cout << "xi1" << xi1 << std::endl;
 			q22 = a+(i+0.5)*step; //std::cout << "xi2" << xi2 << std::endl;
 			q23 = a+(i+1.)*step; //std::cout << "xi3" << xi3 << std::endl;
-			
-			
+					
 			f_q21 = compute_dint_Lambdab_Lambdac(cfg, N, l, mh, mhp, q21);
 			f_q22 = compute_dint_Lambdab_Lambdac(cfg, N, l, mh, mhp, q22);
 			f_q23 = compute_dint_Lambdab_Lambdac(cfg, N, l, mh, mhp, q23);
 			
-
 			fstep = step*(1./6.*f_q21 + 4./6.*f_q22 + 1./6.*f_q23);
 			
 			res += fstep;
+			
 		}
+		std::cout<<"res"<<res<<std::endl;
 		return pow(GF,2)*tauLb/(512*pow(pi,3)*pow(mh,3)*hbar)*pow(VCKM,2)*U2*res;
 	}
 }

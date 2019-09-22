@@ -14,7 +14,12 @@
 #include <chrono>
 #include <thread>
 
-
+Double_t M_LAMBDAb = 5620.2;
+Double_t M_PROTON  = 938.272;
+Double_t M_LAMBDAc = 2286.46;
+Double_t M_B = 5279.29;
+Double_t M_Bc = 6275.1;
+Double_t M_pi = 139.57018;
 
 // Tables
 
@@ -442,37 +447,78 @@ std::vector<Double_t> acoeffs_Lambdab_proton() // table X of [1503.01421]
 
 std::vector<Double_t> acoeffs_Lambdab_Lambdac() // table X of [1503.01421]
 {
-	return { 0.42512661779076, -0.70879824786202, 0.89250038017833, 
-			 0.41441295090913, -1.041709976979, 1.9259425862863, 
-			 0.52144673308125, -0.82467696338466, 0.76090923603286,
-			 0.38886025531083,  -1.0725956052846, 1.9857217253182,
-			 0.44189326677855,  -0.86494888515889, 0.99692910373979,
-			 0.38886025531083, -1.0839467598681, 1.4521580817004 };
+	return { 0.81034719382496, -4.7475223120166, 0.78618045366394, // fplus
+			 0.73889965204015, -4.5633603364873, 2.7050827605253, //f0
+			 1.0939236137642, -6.4413374884146, 2.3161239651561, //fperp
+			 0.68483287500112, -4.3788469218438, 1.2813964795243, //gplus
+			 0.74078109306203, -4.3860778472363, 1.3375076880839, //g0
+			 0.68483287500112, -4.6270436667368, 1.6143367954872  //gperp
+			};
 }
 
+
 std::vector<Double_t> Mpole_Lambdab_proton(){
-	return{ 1., 1., 1., 1., 1., 1.};	
+	return{ M_B + 46,  M_B + 377,  M_B + 46, M_B + 427, M_B, M_B + 427 };	
 	// fplus, f0, fperp, gplus, g0, gplus
 }
 std::vector<Double_t> Mpole_Lambdab_Lambdac(){
-	return{ 1., 1., 1., 1., 1., 1.};	
+	return{ M_Bc + 56,  M_Bc + 449,  M_Bc + 56, M_Bc + 492, M_Bc, M_Bc + 492 };	
 	// fplus, f0, fperp, gplus, g0, gplus
 }
 std::vector<Double_t> tplus_Lambdab_proton(){
-	return{ 1., 1., 1., 1., 1., 1.};
+	return{ pow(M_B+M_pi,2), pow(M_B+M_pi,2), pow(M_B+M_pi,2),
+			pow(M_B+M_pi,2), pow(M_B+M_pi,2), pow(M_B+M_pi,2)
+			};
 	// fplus, f0, fperp, gplus, g0, gplus
 }
 std::vector<Double_t> tplus_Lambdab_Lambdac(){
-	return{ 1., 1., 1., 1., 1., 1.};
+	std::vector<Double_t> result;
+	for(size_t i(0); i<6; ++i) {
+		result.push_back(Mpole_Lambdab_Lambdac()[i]);
+	}
+	return result;
 	// fplus, f0, fperp, gplus, g0, gplus
 }
 
-std::vector<Double_t> z_Lambdab_proton(){
-	return{ 1., 1., 1., 1., 1., 1.};
+
+Double_t t0_proton(){
+	return pow(M_LAMBDAb - M_PROTON,2);
+}
+Double_t t0_Lambdac(){
+	return pow(M_LAMBDAb - M_LAMBDAc,2);
+}
+Double_t zfunction_Lambdab_proton(Double_t tplus, Double_t q2){
+	return (sqrt(tplus - q2) - sqrt(tplus - t0_proton()))/(sqrt(tplus-q2)+sqrt(tplus -t0_proton()));
+}
+Double_t zfunction_Lambdab_Lambdac(Double_t tplus, Double_t q2){
+	return (sqrt(tplus - q2) - sqrt(tplus - t0_Lambdac()))/(sqrt(tplus-q2)+sqrt(tplus -t0_Lambdac()));
+}
+
+std::vector<Double_t> z_Lambdab_proton(Double_t q2){
+	
+	std::vector<Double_t> result;
+	Double_t tplus; 
+	for(size_t i(0); i<6; ++i){
+		tplus = tplus_Lambdab_proton()[i];
+		result.push_back(zfunction_Lambdab_proton(tplus, q2));
+		//std::cout<<"z["<<i<<"]"<<zfunction_Lambdab_Lambdac(tplus, q2)<<std::endl;
+	}
+	
+	return result;
 	// fplus, f0, fperp, gplus, g0, gplus
 }
-std::vector<Double_t> z_Lambdab_Lambdac(){
-	return{ 1., 1., 1., 1., 1., 1.};
+
+std::vector<Double_t> z_Lambdab_Lambdac(Double_t q2){
+	
+	std::vector<Double_t> result;
+	Double_t tplus; 
+	for(size_t i(0); i<6; ++i){
+		tplus = tplus_Lambdab_Lambdac()[i];
+		result.push_back(zfunction_Lambdab_Lambdac(tplus, q2));
+		//std::cout<<"z["<<i<<"]"<<zfunction_Lambdab_Lambdac(tplus, q2)<<std::endl;
+	}
+	
+	return result;
 	// fplus, f0, fperp, gplus, g0, gplus
 }
 
@@ -484,30 +530,38 @@ Double_t f_Lambdab_proton(Double_t q2, int idx){
 	Double_t Mpole, mh, mhp, a0, a1, a2, z, tplus, t0, factor, sum;
 	
 	
-	mh = 5.;
-	mhp = 1.;
+	//mh = M_LAMBDAb;
+	//mhp = M_PROTON;
 	
 	
 	
-	t0		= pow(mh - mhp, 2); 
+	//t0_proton		= pow(mh - mhp, 2); 
 	tplus 	= tplus_Lambdab_proton()[idx];
+	//std::cout<<"tplus" << tplus << std::endl;
 	Mpole 	= Mpole_Lambdab_proton()[idx];
-	z 		= z_Lambdab_proton()[idx];
-	
+	//std::cout<<"Mpole" << Mpole << std::endl;
+	z 		= z_Lambdab_proton(q2)[idx];
+	//std::cout<<"z" << z << std::endl;
 	a0		= acoeffs_Lambdab_proton()[idx*3];
+	//std::cout<<"a0[" << idx*3 << "] = " << a0 << std::endl;
 	a1		= acoeffs_Lambdab_proton()[idx*3+1];
+	//std::cout<<"a1" << a1 << std::endl;
+	//std::cout<<"a1[" << idx*3+1 << "] = " << a1 << std::endl;
 	a2		= acoeffs_Lambdab_proton()[idx*3+2];
+	//std::cout<<"a2[" << idx*3+2 << "] = " << a2 << std::endl;
 	
 	factor = 1/(1-q2/pow(Mpole, 2));
-	
-	
+	//std::cout<<"factor" << factor << std::endl;
 	
 	sum  = a0;
 	sum += a1*z;
 	sum += a2*pow(z,2);
 	
+	//std::cout<<"sum" << sum << std::endl;
 	
+	//std::cout<<"factor*sum" << factor*sum << std::endl;
 	return factor*sum;
+	
 }
 
 Double_t f_Lambdab_Lambdac(Double_t q2, int idx){
@@ -515,28 +569,25 @@ Double_t f_Lambdab_Lambdac(Double_t q2, int idx){
 	Double_t Mpole, mh, mhp, a0, a1, a2, z, tplus, t0, factor, sum;
 	
 	
-	mh = 5.;
-	mhp = 1.;
+	mh = M_LAMBDAb;
+	mhp = M_LAMBDAc;
 	
 	
 	
-	t0		= pow(mh - mhp, 2); 
+	//t0		= pow(mh - mhp, 2); 
 	tplus 	= tplus_Lambdab_Lambdac()[idx];
 	Mpole 	= Mpole_Lambdab_Lambdac()[idx];
-	z 		= z_Lambdab_Lambdac()[idx];
-	
+	z 		= z_Lambdab_Lambdac(q2)[idx];
+	std::cout<<"z" << z << std::endl;
 	a0		= acoeffs_Lambdab_Lambdac()[idx*3];
 	a1		= acoeffs_Lambdab_Lambdac()[idx*3+1];
 	a2		= acoeffs_Lambdab_Lambdac()[idx*3+2];
 	
 	factor = 1/(1-q2/pow(Mpole, 2));
 	
-	
-	
 	sum  = a0;
 	sum += a1*z;
 	sum += a2*pow(z,2);
-	
 	
 	return factor*sum;
 }
@@ -544,85 +595,116 @@ Double_t f_Lambdab_Lambdac(Double_t q2, int idx){
 ////
 
 
+
 Double_t f2V_Lambdab_proton(Double_t q2){ 
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
-	return (mh*(mh+mhp))/(q2-pow(mh+mhp,2)) * (f_Lambdab_proton(q2,0)-f_Lambdab_proton(q2,2));
+	Double_t mh = M_LAMBDAb;
+	Double_t mhp = M_PROTON;
+	
+	Double_t CplusV = q2/(mh*(mh+mhp));
+	Double_t CperpV = (mh+mhp)/mh;
+	/*
+	std::cout << "f_Lambdab_proton(q2,0)" << f_Lambdab_proton(q2,0) << std::endl;
+	std::cout << "f_Lambdab_proton(q2,1)" << f_Lambdab_proton(q2,1) << std::endl;
+	std::cout << "f_Lambdab_proton(q2,2)" << f_Lambdab_proton(q2,2) << std::endl;
+	std::cout << "f_Lambdab_proton(q2,3)" << f_Lambdab_proton(q2,3) << std::endl;
+	std::cout << "f_Lambdab_proton(q2,4)" << f_Lambdab_proton(q2,4) << std::endl;
+	std::cout << "f_Lambdab_proton(q2,5)" << f_Lambdab_proton(q2,5) << std::endl;
+	*/
+	
+	//return (mh*(mh+mhp))/(q2-pow(mh+mhp,2)) * (f_Lambdab_proton(q2,0)-f_Lambdab_proton(q2,2));
+	return (CplusV-CperpV) * (f_Lambdab_proton(q2,0)-f_Lambdab_proton(q2,2));
 }
 Double_t f1V_Lambdab_proton(Double_t q2){ 
 	
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
+	Double_t mh = M_LAMBDAb;
+	Double_t mhp = M_PROTON;
 	
-	return f_Lambdab_proton(q2,0) - (q2/(mh*(mh+mhp)))*f2V_Lambdab_proton(q2);
+	Double_t CplusV = q2/(mh*(mh+mhp));
+	
+	return f_Lambdab_proton(q2,0) - CplusV*f2V_Lambdab_proton(q2);
 }
 Double_t f3V_Lambdab_proton(Double_t q2){ 
 	
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
+	Double_t mh = M_LAMBDAb;
+	Double_t mhp = M_PROTON;
 	
-	return (f_Lambdab_proton(q2,1) - f1V_Lambdab_proton(q2))*(mh*(mh+mhp))/q2; 
+	Double_t C0V = q2/(mh*(mh-mhp));
+	//return (f_Lambdab_proton(q2,1) - f1V_Lambdab_proton(q2))*(mh*(mh-mhp))/q2; 
+	return (f_Lambdab_proton(q2,1) - f1V_Lambdab_proton(q2))/C0V; 
 }
 
 Double_t f2A_Lambdab_proton(Double_t q2){ 
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
-	return (mh*(mh-mhp))/(-q2+pow(mh-mhp,2)) * (f_Lambdab_proton(q2,3)-f_Lambdab_proton(q2,5));
+	Double_t mh = M_LAMBDAb;
+	Double_t mhp = M_PROTON;
+	//std::cout << "q2 = " << q2 << std::endl;
+	//std::cout<<"(mh*(mh-mhp))/(-q2+pow(mh-mhp,2))" << (mh*(mh-mhp))/(-q2+pow(mh-mhp,2)) << std::endl;
+	
+	Double_t CplusA = q2/(mh*(mh-mhp));
+	Double_t CperpA = (mh-mhp)/mh;
+	
+	//return (mh*(mh-mhp))/(-q2+pow(mh-mhp,2)) * (f_Lambdab_proton(q2,3)-f_Lambdab_proton(q2,5));
+	return (-CplusA+CperpA) * (f_Lambdab_proton(q2,3)-f_Lambdab_proton(q2,5));
+	
 }
 Double_t f1A_Lambdab_proton(Double_t q2){ 
 	
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
+	Double_t mh = M_LAMBDAb;
+	Double_t mhp = M_PROTON;
+	Double_t CplusA = q2/(mh*(mh-mhp));
 	
-	return f_Lambdab_proton(q2,0) - (-q2/(mh*(mh-mhp)))*f2A_Lambdab_proton(q2);
+	//return f_Lambdab_proton(q2,0) - (-q2/(mh*(mh-mhp)))*f2A_Lambdab_proton(q2);
+	return f_Lambdab_proton(q2,0) - CplusA*f2A_Lambdab_proton(q2);
 }
 Double_t f3A_Lambdab_proton(Double_t q2){ 
 	
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
+	Double_t mh = M_LAMBDAb;
+	Double_t mhp = M_PROTON;
+	Double_t C0V = q2/(mh*(mh+mhp));
 	
-	return (f_Lambdab_proton(q2,4) - f1V_Lambdab_proton(q2))*(mh*(mh-mhp))/(-q2); 
+	//return (f_Lambdab_proton(q2,4) - f1V_Lambdab_proton(q2))*(mh*(mh+mhp))/(-q2); 
+	return (f_Lambdab_proton(q2,4) - f1V_Lambdab_proton(q2))/C0V; 
+
 }
 
-
+///////////////////////////////////////////////////////////////////////
 
 Double_t f2V_Lambdab_Lambdac(Double_t q2){ // true = V, false = A
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
+	Double_t mh = M_LAMBDAb;
+	Double_t mhp = M_LAMBDAc;
 	return (mh*(mh+mhp))/(q2-pow(mh+mhp,2)) * (f_Lambdab_Lambdac(q2,0)-f_Lambdab_Lambdac(q2,2));
 }
 Double_t f1V_Lambdab_Lambdac(Double_t q2){ // true = V, false = A
 	
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
+	Double_t mh = M_LAMBDAb;
+	Double_t mhp = M_LAMBDAc;
 	
 	return f_Lambdab_Lambdac(q2,0) - (q2/(mh*(mh+mhp)))*f2V_Lambdab_Lambdac(q2);
 }
 Double_t f3V_Lambdab_Lambdac(Double_t q2){ // true = V, false = A
 	
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
+	Double_t mh = M_LAMBDAb;
+	Double_t mhp = M_LAMBDAc;
 	
-	return (f_Lambdab_Lambdac(q2,1) - f1V_Lambdab_Lambdac(q2))*(mh*(mh+mhp))/q2; 
+	return (f_Lambdab_Lambdac(q2,1) - f1V_Lambdab_Lambdac(q2))*(mh*(mh-mhp))/q2; 
 }
 Double_t f2A_Lambdab_Lambdac(Double_t q2){ 
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
+	Double_t mh = M_LAMBDAb;
+	Double_t mhp = M_LAMBDAc;
 	return (mh*(mh-mhp))/(-q2+pow(mh-mhp,2)) * (f_Lambdab_Lambdac(q2,3)-f_Lambdab_Lambdac(q2,5));
 }
 Double_t f1A_Lambdab_Lambdac(Double_t q2){ 
 	
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
+	Double_t mh = M_LAMBDAb;
+	Double_t mhp = M_LAMBDAc;
 	
 	return f_Lambdab_Lambdac(q2,0) - (-q2/(mh*(mh-mhp)))*f2A_Lambdab_Lambdac(q2);
 }
 Double_t f3A_Lambdab_Lambdac(Double_t q2){ 
 	
-	Double_t mh = 5.;
-	Double_t mhp = 1.;
+	Double_t mh = M_LAMBDAb;
+	Double_t mhp = M_LAMBDAc;
 	
-	return (f_Lambdab_Lambdac(q2,4) - f1V_Lambdab_Lambdac(q2))*(mh*(mh-mhp))/(-q2); 
+	return (f_Lambdab_Lambdac(q2,4) - f1V_Lambdab_Lambdac(q2))*(mh*(mh+mhp))/(-q2); 
 }
 
 
@@ -635,10 +717,18 @@ Double_t Delta_hyp(int sgn, Double_t mh, Double_t mhp){
 
 /////////////////
 
+// Equations 
+
 Double_t a1(Double_t q2, Double_t mh, Double_t mhp, Double_t ml, Double_t mN, bool V){
 	Double_t Sigmap = Sigma_hyp(+1, mh, mhp); Double_t Sigmam = Sigma_hyp(-1, mh, mhp);
 	Double_t Deltap = Delta_hyp(+1, mh, mhp); Double_t Deltam = Delta_hyp(-1, mh, mhp);
 	
+	/*
+	std::cout << "Sigmap: " << Sigmap << std::endl;
+	std::cout << "Deltap: " << Deltap << std::endl;
+	std::cout << "Sigmam: " << Sigmam << std::endl;
+	std::cout << "Deltam: " << Deltam << std::endl;
+	*/
 	Double_t Sigma_VA, Delta_VA; int sgn;
 	if(V){
 		sgn = +1;
@@ -651,14 +741,23 @@ Double_t a1(Double_t q2, Double_t mh, Double_t mhp, Double_t ml, Double_t mN, bo
 		Delta_VA = Deltap;
 	}
 	
-	
-	return pow(ml,2)*(q2*(pow(Sigmam,2) - 2*pow(mN,2)*Sigmap)
+	/*
+	std::cout << "------ a1 = " << pow(ml,2)*(q2*(pow(Sigmam,2) - 2*pow(mN,2)*Sigmap)
 					 - 2*pow(q2,2)*(pow(mN,2) - 1*sgn*mh*mhp + pow(Delta_VA,2))
 					 + 4*pow(mN,2)*pow(Sigmam, 2) 
 					 + pow(q2, 3)
 					 )
 		 +(q2 - pow(mN,2))* (pow(mN,2)*(q2*Sigmap-2*Sigmam+pow(q2,2))
 							 - q2*((pow(Delta_VA,2)-q2)*(Sigma_VA+2*q2))
+							) << std::endl;
+	*/
+	return pow(ml,2)*(q2*(pow(Sigmam,2) - 2*pow(mN,2)*Sigmap)
+					 - 2*pow(q2,2)*(pow(mN,2) - sgn*mh*mhp + pow(Delta_VA,2))
+					 + 4*pow(mN,2)*pow(Sigmam, 2) 
+					 + pow(q2, 3)
+					 )
+		 +(q2 - pow(mN,2))* (pow(mN,2)*(q2*Sigmap-2*Sigmam+pow(q2,2))
+							 - q2*((pow(Delta_VA,2)-q2)*(pow(Sigma_VA,2)+2*pow(q2,2))) //pow(q2,2) instead of q2
 							);
 }
 
@@ -679,8 +778,15 @@ Double_t a2(Double_t q2, Double_t mh, Double_t mhp, Double_t ml, Double_t mN, bo
 	}
 	
 	
+	std::cout << "---- a2 part 1 :" << ( q2*(pow(ml,2) + pow(mN, 2)) 
+			  +pow(pow(ml,2)-pow(mN,2),2)
+			  -2*pow(q2,2) 
+			  ) << std::endl;
+	std::cout << "---- a2 part 2 :" << q2*( pow(Sigma_VA,2)+sgn*4*mh*mhp )
+			  -2*(pow(Sigmam,2)+pow(q2,2)) << std::endl;		  
+			  
 	
-	return  (  q2*(pow(ml,2) + pow(mN, 2)) 
+	return  ( q2*(pow(ml,2) + pow(mN, 2)) 
 			  +pow((pow(ml,2)-pow(mN,2)),2)
 			  -2*pow(q2,2) 
 			  )
@@ -690,13 +796,52 @@ Double_t a2(Double_t q2, Double_t mh, Double_t mhp, Double_t ml, Double_t mN, bo
 }
 
 Double_t a3(Double_t q2, Double_t mh, Double_t mhp, Double_t ml, Double_t mN, bool V){
-	return 1.;
+	Double_t Sigmap = Sigma_hyp(+1, mh, mhp); Double_t Sigmam = Sigma_hyp(-1, mh, mhp);
+	Double_t Deltap = Delta_hyp(+1, mh, mhp); Double_t Deltam = Delta_hyp(-1, mh, mhp);
+	
+	Double_t Sigma_VA, Delta_VA; int sgn;
+	if(V){
+		sgn=+1;
+		//Sigma_VA = Sigmap;
+		Delta_VA = Deltap;
+	}
+	else{
+		sgn=-1;
+		//Sigma_VA = Sigmam;
+		Delta_VA = Deltam;
+	}
+	return (pow(Delta_VA,2) - pow(q2,2)) * 
+				 ( pow(ml,2)* (  q2 + 2*pow(mN,2) - pow(ml,2))
+				  +pow(mN,2)*(q2 - pow(mN,2)) );
 }
 Double_t a12(Double_t q2, Double_t mh, Double_t mhp, Double_t ml, Double_t mN, bool V){
-	return 1.;
+	Double_t Sigmap = Sigma_hyp(+1, mh, mhp); Double_t Sigmam = Sigma_hyp(-1, mh, mhp);
+	Double_t Deltap = Delta_hyp(+1, mh, mhp); Double_t Deltam = Delta_hyp(-1, mh, mhp);
+	
+	//Double_t Sigma_VA, Delta_VA; 
+	if(V){
+		return Sigmap*(Sigmam-q2)*
+		( pow(ml,2)*(q2-2*pow(mN,2)) + pow(ml,4) + pow(mN,4) + pow(mN,2)*q2 - 2*pow(q2,2));
+	}
+	else{
+		return Sigmam*(Sigmap-q2)*
+		( pow(ml,2)*(q2-2*pow(mN,2)) + pow(ml,4) + pow(mN,4) + pow(mN,2)*q2 - 2*pow(q2,2));
+	}	
+
 }
 Double_t a13(Double_t q2, Double_t mh, Double_t mhp, Double_t ml, Double_t mN, bool V){
-	return 1.;
+	Double_t Sigmap = Sigma_hyp(+1, mh, mhp); Double_t Sigmam = Sigma_hyp(-1, mh, mhp);
+	Double_t Deltap = Delta_hyp(+1, mh, mhp); Double_t Deltam = Delta_hyp(-1, mh, mhp);
+	
+	//Double_t Sigma_VA, Delta_VA; 
+	if(V){
+		return Sigmam*(Sigmap-q2)*
+		( pow( pow(ml,2) - pow(mN,2) ,2) - q2*(pow(ml,2) + pow(mN,2)) );
+	}
+	else{
+		return Sigmap*(Sigmam-q2)*
+		( pow( pow(ml,2) - pow(mN,2) ,2) - q2*(pow(ml,2) + pow(mN,2)) );
+	}
 }
 
 
