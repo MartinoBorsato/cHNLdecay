@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
   Double_t ctau = 0;
   
   //variables for production BR
-  int BID(521), dID(0);
+  int BID(521), d1ID(0), d2ID(0), lAID(0), lBID(0), nuBID(0);
 
   // sensible default for loglevel
   gLOGLEVEL = Level::INFO;
@@ -88,7 +88,11 @@ int main(int argc, char **argv) {
         {"majorana", required_argument, 0, 'c'},
         {"search-ctau", required_argument, 0, 's'},
         {"BmesonID", required_argument, 0, 'b'},
-        {"daughterMesonID", required_argument, 0, 'd'},
+        {"PrimaryMesonID", required_argument, 0, 'd'},
+        {"SecondaryMesonID", required_argument, 0, 'e'},
+        {"LeptonA_ID", required_argument, 0, 'A'},
+        {"LeptonB_ID", required_argument, 0, 'B'},
+        {"NeutrinoB_ID", required_argument, 0, 'C'},
         {0, 0, 0, 0}};
 
     /* getopt_long stores the option index here. */
@@ -174,24 +178,33 @@ int main(int argc, char **argv) {
       break;
     }
 
-
     case 'c':
       if(std::atoi(optarg)==1)
         majorana = true;
       else
         majorana = false;
-      break;
-      
+      break;   
       
     case 'b':
 	  BID = std::atoi(optarg);
       break;
       
     case 'd':
-	  dID = std::atoi(optarg);
+	  d1ID = std::atoi(optarg);
       break;
-	
-
+	case 'e':
+	  d2ID = std::atoi(optarg);
+      break;
+      
+	case 'A':
+	  lAID = std::atoi(optarg);
+      break;
+    case 'B':
+	  lBID = std::atoi(optarg);
+      break;
+    case 'C':
+	  nuBID = std::atoi(optarg);
+      break;
     case '?':
       /* getopt_long already printed an error message. */
       break;
@@ -200,9 +213,7 @@ int main(int argc, char **argv) {
       abort();
     }
   }
-  
-  
-  if(mainmode==0){
+	if(mainmode==0){
 
 	  /* Print any remaining command line arguments (not options). */
 	  if (optind < argc) {
@@ -223,7 +234,6 @@ int main(int argc, char **argv) {
 	  Double_t Gamma = N.getTotalWidth(cfg, all_leptons, mesons);
 	  LOG_INFO("mass=" << N.getMass() / 1000. << " GeV, "
 					   << "ctau=" << gamma2ctau(cfg, Gamma) << " mm");
-
 
 	  Quark down = Quark(1, 4.8, Quark_Type::down);
 	  Quark up = Quark(2, 2.3, Quark_Type::up);
@@ -347,34 +357,84 @@ int main(int argc, char **argv) {
 	  // EXAMPLE for further checks and configurations
 	  // ----------
 	  // N.setMass(3000);
-	  // LOG_INFO("pw: " << N.getPartialWidth(cfg, mu, rho));
-
-	  
+	  // LOG_INFO("pw: " << N.getPartialWidth(cfg, mu, rho));  
 	}
 	
-	else if(mainmode==1){
-		
+	// Production BR
+	else if(mainmode==1){		
 //		std::cout<<"hello: "<<mixes_with[0].getPdgId()<<std::endl;
-//		std::cout<<"BID: "<<BID<<std::endl;
-		
-		if(dID==0){
+//		std::cout<<"BID: "<<BID<<std::endl;	
+		if(d1ID==0){
 			//Double_t HNLmass_GeV = ;
 			for (size_t i(0); i<mixes_with.size(); i++){
-				std::cout<<prodBR_lept(BID, mixes_with[i].getPdgId(), HNLmass, tau0);
+				std::cout<<prodBR_lept(BID, mixes_with[i].getPdgId(), HNLmass, tau0) << std::endl;
+                std::cout<<tau0_to_U2(HNLmass, tau0);
 				//std::cout<<"leptonic"<<std::endl;
 			}
-		}
-		
+		}	
 		else{
 			for (size_t i(0); i<mixes_with.size(); i++){
-				std::cout<<prodBR_semilept(BID, mixes_with[i].getPdgId(), dID, HNLmass, tau0);
-				//std::cout<<"semileptonic"<<std::endl;
-			}
-		}	
-	}
+
+    //case 2: { // FIXME use something similar to get BRs?
+
+		//if(dID==0){
+			//for (size_t i(0); i<mixes_with.size(); i++){
+				//std::cout<<prodBR_lept_U2(BID, mixes_with[i].getPdgId(), HNLmass, angle) << std::endl;
+                //std::cout<<U2_to_tau0(HNLmass, angle);
+			//}
+		//}
+		
+		//else{
+			//for (size_t i(0); i<mixes_with.size(); i++){
+				//std::cout<<prodBR_semilept_U2(BID, mixes_with[i].getPdgId(), dID, HNLmass, angle) << std::endl;
+                //std::cout<<tau0_to_U2(HNLmass, tau0);
+			//}
+
+        //}
+    //}
+  //}
   //Double_t test2 = prodBR_lept(521, 13, 3500., 5.e-12);
   //std::cout<<"test " << test << std::endl;
   //std::cout<<"test2 " << test2 << std::endl;
   //std::cout<<"kal " << kal << std::endl;
-  return EXIT_SUCCESS;
+				//std::cout << "avant prodBR_semilept" << std::endl;
+				std::cout<<prodBR_semilept(BID, mixes_with[i].getPdgId(), d1ID, HNLmass, tau0);
+				//std::cout<<"semileptonic"<<std::endl;
+			}
+		}	
+	}
+	
+	// Decay BR
+	else if(mainmode==2){
+		
+		Double_t muonMass = 105.6583715; 
+		Lepton mu = Lepton(13, muonMass);
+		
+		std::vector<Lepton> mixes_with={mu};
+		HNL N = HNL("HNL", HNLmass, angle, mixes_with);
+		N.setMajorana(true);
+		
+		//std::cout << "lAID" << lAID <<std::endl;
+		//std::cout << "d2ID" << d2ID <<std::endl;
+		std::cout<<decayBR_lepton_meson(lAID, d2ID, HNLmass, tau0);
+		
+		//std::cout<<"\ngetTotalWidth: "<< N.getTotalWidth(cfg,all_leptons,mesons)<<std::endl;
+	}
+	else if(mainmode==3) std::cout<<decayBR_lepton_lepton_neutrino(lAID, lBID, nuBID, HNLmass, tau0);
+
+	//Double_t test2 = prodBR_lept(521, 13, 3500., 5.e-12);
+	//std::cout<<"test " << test << std::endl;
+	//std::cout<<"test2 " << test2 << std::endl;
+	//std::cout<<"kal " << kal << std::endl;
+	
+	else if(mainmode==4) std::cout<<tau0_to_U2(HNLmass, tau0); //MeV, ns
+	else if(mainmode==5) std::cout<<U2_to_tau0(HNLmass, angle); //MeV, ns
+	
+	//else if(mainmode==5) compute_dint_Lambdab_proton(cfg, N, l, 5., 1., q2); 
+	//else if(mainmode==6) compute_dint_Lambdab_Lambdac(cfg, N, l, 5., 2., q2); 
+		
+	
+	return EXIT_SUCCESS;
 }
+
+
