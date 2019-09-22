@@ -1,58 +1,92 @@
 from subprocess import Popen, PIPE
 
-def get_prod_BR(HNLmass_GeV, HNLlifetime_ns, B_ID, meson_ID, lepton_ID, cHNLdecayDIR='../cHNLdecay/', verbose=False):
-    HNLmass_MeV = HNLmass_GeV*1e3
-    output = Popen(['./cHNLdecay', '--mainmode', '1', '--BmesonID', str(B_ID), '--daughterMesonID', str(meson_ID), '--generations', str(lepton_ID), '--mass', str(HNLmass_MeV), '--lifetime-ns', str(HNLlifetime_ns)], stdout=PIPE, cwd=cHNLdecayDIR)
-    out = output.stdout.read()
-    out_BR = float(out.split()[0])
-    out_U2 = float(out.split()[1])
-    if verbose:
-        print("\n------\nINFO: BR calculator output: ", out_BR, "\n-------\n")
+#def get_prod_BR(HNLmass_GeV, HNLlifetime_ns, B_ID, meson_ID, lepton_ID, cHNLdecayDIR='../cHNLdecay/', verbose=False):
+    #HNLmass_MeV = HNLmass_GeV*1e3
+    #output = Popen(['./cHNLdecay', '--mainmode', '1', '--BmesonID', str(B_ID), '--daughterMesonID', str(meson_ID), '--generations', str(lepton_ID), '--mass', str(HNLmass_MeV), '--lifetime-ns', str(HNLlifetime_ns)], stdout=PIPE, cwd=cHNLdecayDIR)
+    #out = output.stdout.read()
+    #out_BR = float(out.split()[0])
+    #out_U2 = float(out.split()[1])
+    #if verbose:
+        #print("\n------\nINFO: BR calculator output: ", out_BR, "\n-------\n")
 
-    return out_BR, out_U2
+    #return out_BR, out_U2
 
-def get_prod_BR_U2(HNLmass_GeV, U2, B_ID, meson_ID, lepton_ID, cHNLdecayDIR='../cHNLdecay/', verbose=False):
-    HNLmass_MeV = HNLmass_GeV*1e3
-    output = Popen(['./cHNLdecay', '--mainmode', '2', '--BmesonID', str(B_ID), '--daughterMesonID', str(meson_ID), '--generations', str(lepton_ID), '--mass', str(HNLmass_MeV), '--angle', str(U2)], stdout=PIPE, cwd=cHNLdecayDIR)
-    out = output.stdout.read()
-    out_BR = float(out.split()[0])
-    out_tau = float(out.split()[1])
-    if verbose:
-        print("\n------\nINFO: BR calculator output: ", out_BR, "\n-------\n")
+#def get_prod_BR_U2(HNLmass_GeV, U2, B_ID, meson_ID, lepton_ID, cHNLdecayDIR='../cHNLdecay/', verbose=False):
+    #HNLmass_MeV = HNLmass_GeV*1e3
+    #output = Popen(['./cHNLdecay', '--mainmode', '2', '--BmesonID', str(B_ID), '--daughterMesonID', str(meson_ID), '--generations', str(lepton_ID), '--mass', str(HNLmass_MeV), '--angle', str(U2)], stdout=PIPE, cwd=cHNLdecayDIR)
+    #out = output.stdout.read()
+    #out_BR = float(out.split()[0])
+    #out_tau = float(out.split()[1])
+    #if verbose:
+        #print("\n------\nINFO: BR calculator output: ", out_BR, "\n-------\n")
 
-    return out_BR, out_tau
+    #return out_BR, out_tau
 
-
-import matplotlib
-matplotlib.use('Agg')
-#from matplotlib import pyplot as plt
-import pylab as plt
-import matplotlib.colors as colors
-from matplotlib.backends.backend_pdf import PdfPages
-import numpy as np
-import sys
-
-def plot_prod_BR():
+def get_prod_BR(HNLmass_GeV, HNLlifetime_ns, B_ID, meson_ID, lepton_ID, cHNLdecayDIR='../cHNLdecay/'): #FIXME need to add cwd
 	
-	BR1 = []
-	BR2 = []
-	BR3 = []
-	M = (0.5, 1, 2, 4)
-	# Fixed lifetime 1ns
-	lifetime=10 #1ns
-	for m in M:
-		BR1.append(get_prod_BR(m, lifetime, 521, 0, 13))
-		BR2.append(get_prod_BR(m, lifetime, 521, 111, 13))
-		#np.append(BR3, 0.5, get_prod_BR(m, 1, 511, 0, 13))
+	HNLmass_MeV = HNLmass_GeV*1e3;
 	
-	plt.figure()
-	plt.yscale('log')
-	plt.title(r'BR prod, for fixed $\tau_N$ = '+str(lifetime)+' ns')
-	plt.xlabel("$m_N$ [GeV]", fontsize=14)
-	plt.ylabel('BR', fontsize=14)
-	plt.plot(M, BR1, color='sienna', linestyle = 'dashed',linewidth = 0.8,label=r'$B^0 \rightarrow \mu^+ N$')
-	plt.plot(M, BR2, color='orangered', linestyle = 'dashed',linewidth = 0.8,label=r'$B^0 \rightarrow \pi^- \mu^+ N$')
-	plt.legend()
-	plt.savefig('prod_BRs_check.pdf')
+	output = Popen(['./cHNLdecay', '--mainmode', '1', '--BmesonID', str(B_ID), '--PrimaryMesonID', str(meson_ID),\
+					'--generations', str(lepton_ID), '--mass', str(HNLmass_MeV), '--lifetime-ns', str(HNLlifetime_ns)], stdout=PIPE, cwd=cHNLdecayDIR)
+	out = output.stdout.read()
+	#print("\n------\nINFO: BR calculator output: ", out, "\n-------\n");
+
+	out_BR = float(out.split()[0]);
+	return out_BR;
 	
+def get_decay_BR_lepton_meson(HNLmass_GeV, HNLlifetime_ns, lepton_ID, meson_ID, cHNLdecayDIR='../cHNLdecay/'):
+	
+	HNLmass_MeV = HNLmass_GeV*1e3;
+	
+	output = Popen(['./cHNLdecay', '--mainmode', '2', '--SecondaryMesonID', str(meson_ID), '--LeptonA_ID', str(lepton_ID),\
+					'--generations', str(lepton_ID), '--mass', str(HNLmass_MeV), '--lifetime-ns', str(HNLlifetime_ns)], stdout=PIPE, cwd=cHNLdecayDIR)
+	out = output.stdout.read()
+	#print("\n------\nINFO: BR calculator output: ", out, "\n-------\n");
+	
+	out_BR = float(out.split()[0]);
+	
+	return out_BR;
+	#return 0;
+	
+def get_decay_BR_lepton_lepton_neutrino(HNLmass_GeV, HNLlifetime_ns, leptonA_ID, leptonB_ID, neutrinoB_ID, cHNLdecayDIR='../cHNLdecay/'):
+	
+	HNLmass_MeV = HNLmass_GeV*1e3;
+	
+	output = Popen(['./cHNLdecay', '--mainmode', '3', '--LeptonA_ID', str(leptonA_ID),\
+					'--LeptonB_ID', str(leptonB_ID), '--NeutrinoB_ID', str(neutrinoB_ID),\
+					'--generations', str(leptonA_ID), '--mass', str(HNLmass_MeV), '--lifetime-ns', str(HNLlifetime_ns)], stdout=PIPE, cwd=cHNLdecayDIR)
+	out = output.stdout.read()
+	#print("\n------\nINFO: BR calculator output: ", out, "\n-------\n");
+	
+	out_BR = float(out.split()[0]);
+	
+	return out_BR;
+	
+	
+	
+def get_Umu2(HNLmass_GeV, HNLlifetime_ns, cHNLdecayDIR='../cHNLdecay/'):
+	
+	HNLmass_MeV = HNLmass_GeV*1e3;
+	
+	output = Popen(['./cHNLdecay', '--mainmode', '4', \
+					'--generations','13', '--mass', str(HNLmass_MeV), '--lifetime-ns', str(HNLlifetime_ns)], stdout=PIPE, cwd=cHNLdecayDIR)
+	out = output.stdout.read()
+	#print("\n------\nINFO: BR calculator output: ", out, "\n-------\n");
+	
+	out_Umu2 = float(out.split()[0]);
+	
+	return out_Umu2;
+
+def get_lifetime(HNLmass_GeV, U2, cHNLdecayDIR='../cHNLdecay/'):
+	
+	HNLmass_MeV = HNLmass_GeV*1e3;
+	
+	output = Popen(['./cHNLdecay', '--mainmode', '5', \
+					'--generations','13', '--mass', str(HNLmass_MeV), '--angle', str(U2)], stdout=PIPE, cwd=cHNLdecayDIR)
+	out = output.stdout.read()
+	#print("\n------\nINFO: BR calculator output: ", out, "\n-------\n");
+	
+	out_lifetime = float(out.split()[0]);
+	
+	return out_lifetime;
 
