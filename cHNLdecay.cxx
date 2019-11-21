@@ -416,7 +416,7 @@ int main(int argc, char **argv) {
 		
 		//std::cout << "lAID" << lAID <<std::endl;
 		//std::cout << "d2ID" << d2ID <<std::endl;
-		std::cout<<decayBR_lepton_meson(lAID, d2ID, HNLmass, tau0);
+		std::cout<<decayBR_lepton_meson(lAID, d2ID, HNLmass, angle);
 		
 		//std::cout<<"\ngetTotalWidth: "<< N.getTotalWidth(cfg,all_leptons,mesons)<<std::endl;
 	}
@@ -432,7 +432,9 @@ int main(int argc, char **argv) {
 	else if(mainmode==5) std::cout<<prodBR_Lambdab_Lambdac(HNLmass, tau0);
 	
 	else if(mainmode==6) std::cout<<tau0_to_U2(HNLmass, tau0); //MeV, ns
-	else if(mainmode==7) std::cout<<get_tau0ns(HNLmass, angle); //MeV, ns
+	else if(mainmode==7) std::cout<<get_tau0ns(HNLmass, angle); //MeV
+	else if(mainmode==8) std::cout<<get_GammaOverGammaInv(HNLmass, angle); //MeV
+	else if(mainmode==9) std::cout<<get_GammaMesonOverGammaQuarks(HNLmass, angle); //MeV
 	
 	return EXIT_SUCCESS;
 }

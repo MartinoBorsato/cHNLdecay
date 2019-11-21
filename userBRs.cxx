@@ -25,6 +25,7 @@
 auto cfg = std::make_shared<Config>(); // set BITS and initialize constants
 
 double hbar=4.135667e-21; //in MeV/s
+double c=299.792458; //in mm/ns
 std::vector<std::vector<Double_t>> VCKM{{0.97427, 0.22534, 0.00351}, 
 										{0.22520, 0.97344, 0.04120}, 
 										{0.00867, 0.04040, 0.999146}};
@@ -47,6 +48,16 @@ ParticleCatalogue pc;
 std::vector<Lepton> all_leptons = pc.getAllLeptons();
 
 std::vector<Meson> all_mesons = pc.getAllMesons();
+
+Quark down = Quark(1, 4.8, Quark_Type::down);
+Quark up = Quark(2, 2.3, Quark_Type::up);
+Quark strange = Quark(3, 96, Quark_Type::charm);
+Quark charm = Quark(4, 1280, Quark_Type::charm);
+Quark bottom = Quark(5, 4180, Quark_Type::bottom);
+Quark top = Quark(6, 173100, Quark_Type::top);
+
+std::vector<Quark> quarks = {up, down, strange, charm, bottom, top};
+
 	
 
 //////////////////////////////////////////////////////////////////
@@ -260,7 +271,7 @@ Double_t tau0_to_U2(Double_t mN, Double_t tau0mN){ // inputs: mN in MeV, tau0mN 
 	
 	//Double_t tau1;
 	HNL N = HNL("HNL", mN, 1., mixes_with);
-	Double_t tau1 = hbar/N.getTotalWidth(cfg, mixes_with, all_mesons)*1e9; // in ns
+    Double_t tau1 = gamma2ctau(cfg, N.getTotalWidth(cfg, mixes_with, quarks)) / c; // in ns
 	
 	//proportionnality
 	Double_t U2=tau1/tau0mN;
@@ -271,10 +282,35 @@ Double_t get_tau0ns(Double_t mN, Double_t U2){ // inputs: mN in MeV, tau0mN in n
 	
 	//Double_t tau1;
 	HNL N = HNL("HNL", mN, U2, mixes_with);
-	Double_t tau0 = hbar/N.getTotalWidth(cfg, mixes_with, all_mesons)*1e9; // in ns
+    Double_t tau0 = gamma2ctau(cfg, N.getTotalWidth(cfg, mixes_with, quarks)) / c; // in ns
 	
 	return tau0;
 }
+
+Double_t get_GammaOverGammaInv(Double_t mN, Double_t U2){ // inputs: mN in MeV, tau0mN in ns
+	
+	HNL N = HNL("HNL", mN, U2, mixes_with);
+    Double_t totW = N.getTotalWidth(cfg, mixes_with, all_mesons);
+    Double_t invW = N.getTotalWidthInv(cfg, mixes_with);
+    Double_t GammaOverGammaInv;
+    GammaOverGammaInv = totW/invW;
+	
+	return GammaOverGammaInv;
+}
+
+Double_t get_GammaMesonOverGammaQuarks(Double_t mN, Double_t U2){ // inputs: mN in MeV, tau0mN in ns
+	
+	//Double_t tau1;
+	HNL N = HNL("HNL", mN, U2, mixes_with);
+    Double_t Gmeson = N.getTotalWidthSingleMeson(cfg, all_leptons, all_mesons);
+    Double_t Gquarks = N.getTotalWidthQuarks(cfg, all_leptons, quarks);
+    Double_t Gratio;
+    Gratio = Gmeson/Gquarks;
+	
+	return Gratio;
+}
+
+
 
 Double_t U2_to_tau0(Double_t mN, Double_t U2){
 	
@@ -523,11 +559,11 @@ Double_t prodBR_semilept_U2(int idB, int idl, int idH, Double_t mN, Double_t U2)
 
 // decay BR: semileptonic case, 2 body
 
-Double_t decayBR_lepton_meson(int idl, int idH, Double_t mN, Double_t tau0mN){
+Double_t decayBR_lepton_meson(int idl, int idH, Double_t mN, Double_t U2){
 	
 	Double_t BR;
 	Double_t pw, totw;
-	Double_t U2 = tau0_to_U2(mN, tau0mN);
+	//Double_t U2 = tau0_to_U2(mN, tau0mN);
 	
 	test_value(U2, 0., 1., "coupling U_{muN}^2");
 	//std::cout<<"U2:"<<U2<<std::endl;
@@ -555,7 +591,8 @@ Double_t decayBR_lepton_meson(int idl, int idH, Double_t mN, Double_t tau0mN){
 			
 	pw = pw_charged_pseudoscalar_mesons(cfg, l, H, N);
 	//std::cout << "pw: " << pw << std::endl;
-	totw = hbar/(tau0mN*1e-9);
+	//totw = hbar/(tau0mN*1e-9);
+    totw = N.getTotalWidth(cfg, mixes_with, quarks);
 	//std::cout << "totw: " << totw << std::endl;
 	
 	test_value(pw/totw, 0., 1., "Production branching ratio");

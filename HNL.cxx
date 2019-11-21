@@ -152,6 +152,7 @@ Double_t HNL::getTotalWidth(std::shared_ptr<Config> cfg,
                             const std::vector<Meson> &particles) {
   Double_t tw_lept = 0;
   Double_t tw_mes = 0;
+  Double_t tw_inv = 0;
   this->clearDecayChannels();
 
   for (auto l1 : leptons) {
@@ -160,6 +161,11 @@ Double_t HNL::getTotalWidth(std::shared_ptr<Config> cfg,
       if (t > 0)
         LOG_DEBUG(l1.getName() << " " << l2.getName() << ": " << t);
       tw_lept += t;
+
+      Double_t tinv = this->getPartialWidthInv(cfg, l1, l2);
+      if (tinv > 0)
+        LOG_DEBUG(l1.getName() << " " << l2.getName() << ": " << tinv);
+      tw_inv += tinv;
     }
     for (auto m : particles) {
       Double_t t = this->getPartialWidth(cfg, l1, m);
@@ -173,7 +179,7 @@ Double_t HNL::getTotalWidth(std::shared_ptr<Config> cfg,
   LOG_DEBUG("QCD correction: " << qcd_corr);
   delete f;
 
-  Double_t totalWidth = (1 + qcd_corr) * tw_mes + tw_lept;
+  Double_t totalWidth = (1 + qcd_corr) * tw_mes + tw_lept + tw_inv; 
 
   return totalWidth;
 
@@ -184,6 +190,7 @@ Double_t HNL::getTotalWidth(std::shared_ptr<Config> cfg,
                             const std::vector<Quark> &particles) {
   Double_t tw_lept = 0;
   Double_t tw_mes = 0;
+  Double_t tw_inv = 0;
   this->clearDecayChannels();
 
   for (auto l1 : leptons) {
@@ -192,6 +199,11 @@ Double_t HNL::getTotalWidth(std::shared_ptr<Config> cfg,
       if (t > 0)
         LOG_DEBUG(l1.getName() << " " << l2.getName() << ": " << t);
       tw_lept += t;
+
+      Double_t tinv = this->getPartialWidthInv(cfg, l1, l2);
+      if (tinv > 0)
+        LOG_DEBUG(l1.getName() << " " << l2.getName() << ": " << tinv);
+      tw_inv += tinv;
     }
     for (auto m : particles) {
       for (auto n : particles) {
@@ -211,8 +223,86 @@ Double_t HNL::getTotalWidth(std::shared_ptr<Config> cfg,
   LOG_DEBUG("QCD correction: " << qcd_corr);
   delete f;
 
-  Double_t totalWidth = (1 + qcd_corr) * tw_mes + tw_lept;
+  Double_t totalWidth = (1 + qcd_corr) * tw_mes + tw_lept + tw_inv; 
 
   return totalWidth;
 
 }
+
+
+Double_t HNL::getTotalWidthInv(std::shared_ptr<Config> cfg,
+                            const std::vector<Lepton> &leptons) {
+  Double_t tw_inv = 0;
+  this->clearDecayChannels();
+
+  for (auto l1 : leptons) {
+    for (auto l2 : leptons) {
+      Double_t tinv = this->getPartialWidthInv(cfg, l1, l2);
+      if (tinv > 0)
+        LOG_DEBUG(l1.getName() << " " << l2.getName() << ": " << tinv);
+      tw_inv += tinv;
+    }
+  }
+
+  Double_t totalWidth = tw_inv;
+  return totalWidth;
+
+}
+
+
+Double_t HNL::getTotalWidthSingleMeson(std::shared_ptr<Config> cfg,
+                            const std::vector<Lepton> &leptons,
+                            const std::vector<Meson> &particles) {
+  Double_t tw_mes = 0;
+  this->clearDecayChannels();
+
+  for (auto l1 : leptons) {
+    for (auto m : particles) {
+      Double_t t = this->getPartialWidth(cfg, l1, m);
+      if (t > 0)
+        LOG_DEBUG(l1.getName() << " " << m.getName() << ": " << t);
+      tw_mes += t;
+    }
+  }
+  TF1 *f = new TF1("#Delta_{QCD}", qcd_coupling, 1, 100, 0);
+  Double_t qcd_corr = qcd_correction(f->Eval(this->getMass() / 1000.));
+  LOG_DEBUG("QCD correction: " << qcd_corr);
+  delete f;
+
+  Double_t totalWidth = (1 + qcd_corr) * tw_mes;
+
+  return totalWidth;
+
+}
+
+Double_t HNL::getTotalWidthQuarks(std::shared_ptr<Config> cfg,
+                            const std::vector<Lepton> &leptons,
+                            const std::vector<Quark> &particles) {
+  Double_t tw_mes = 0;
+  this->clearDecayChannels();
+
+  for (auto l1 : leptons) {
+    for (auto m : particles) {
+      for (auto n : particles) {
+        Double_t t = this->getPartialWidth(cfg, l1, m, n);
+        if (t > 0)
+          LOG_DEBUG(l1.getName() << " " << m.getName() << ": " << t);
+        tw_mes += t;
+      }
+      Double_t t = this->getPartialWidth(cfg, l1, m);
+      if (t > 0)
+        LOG_DEBUG(l1.getName() << " " << m.getName() << ": " << t);
+      tw_mes += t;
+    }
+  }
+  TF1 *f = new TF1("#Delta_{QCD}", qcd_coupling, 1, 100, 0);
+  Double_t qcd_corr = qcd_correction(f->Eval(this->getMass() / 1000.));
+  LOG_DEBUG("QCD correction: " << qcd_corr);
+  delete f;
+
+  Double_t totalWidth = (1 + qcd_corr) * tw_mes; 
+
+  return totalWidth;
+
+}
+

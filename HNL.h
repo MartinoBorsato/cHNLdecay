@@ -110,6 +110,14 @@ public:
   Double_t getTotalWidth(std::shared_ptr<Config> cfg,
                          const std::vector<Lepton> &leptons,
                          const std::vector<Quark> &particles);
+  Double_t getTotalWidthInv(std::shared_ptr<Config> cfg,
+                         const std::vector<Lepton> &leptons);
+  Double_t getTotalWidthQuarks(std::shared_ptr<Config> cfg,
+                         const std::vector<Lepton> &leptons,
+                         const std::vector<Quark> &particles);
+  Double_t getTotalWidthSingleMeson(std::shared_ptr<Config> cfg,
+                         const std::vector<Lepton> &leptons,
+                         const std::vector<Meson> &particles);
 
 private:
   TString name;
