@@ -18,6 +18,7 @@
 
 #include "TAxis.h"
 #include "TCanvas.h"
+#include "TObjArray.h"
 #include "TF1.h"
 #include "TGraph.h"
 #include "TLegend.h"
