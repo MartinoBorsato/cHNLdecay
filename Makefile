@@ -2,13 +2,10 @@
 #-include ../config.mk
 
 EX = cHNLdecay
-CC = gcc
-CXX = g++
-RM = rm -f
-CPPFLAGS = -g $(shell root-config --cflags) -I/usr/include
-LDFLAGS = -g $(shell root-config --ldflags)
-LDLIBS = $(shell root-config --libs) -lmpfr -lgmp -L/usr/lib -L/usr/lib64
-LDLIBS_DBG = $(shell root-config --libs) -lmpfr -lgmp -L/usr/lib -L/usr/lib64 -lprofiler -ltcmalloc
+CPPFLAGS += -g $(shell root-config --cflags)
+LDFLAGS += -g $(shell root-config --ldflags)
+LDLIBS += $(shell root-config --libs) -lmpfr -lgmp
+LDLIBS_DBG += $(shell root-config --libs) -lmpfr -lgmp -lprofiler -ltcmalloc
 
 SRCS = $(wildcard *.cxx)
 #SRCS = auxfunctions.cxx HNL.cxx Logger.cxx partialWidths.cxx plots.cxx prodFromBmesons.cxx
